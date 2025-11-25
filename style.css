@@ -1,0 +1,87 @@
+body {
+    background-color: #0d1117; /* خلفية داكنة احترافية */
+    color: #f0f6fc;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    direction: rtl; 
+    text-align: right;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.balance-card {
+    background: linear-gradient(135deg, #1f2a37, #131a22); 
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.balance-label {
+    font-size: 14px;
+    color: #8b949e;
+    margin-bottom: 5px;
+}
+
+.balance-amount {
+    font-size: 36px;
+    font-weight: bold;
+    color: #58a6ff; 
+    margin: 0;
+}
+
+.small-btn {
+    background: #30363d;
+    color: #f0f6fc;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.action-btn {
+    background-color: #1f2a37;
+    color: #f0f6fc;
+    border: 1px solid #30363d;
+    padding: 20px 15px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.action-btn .icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: #79c0ff;
+}
+
+.action-btn .text {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.info-footer {
+    text-align: center;
+    font-size: 12px;
+    color: #8b949e;
+    margin-top: 30px;
+}

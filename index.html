@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdFlow Pro - لوحة التحكم</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="balance-card">
+            <p class="balance-label">رصيدك الحالي</p>
+            <h1 class="balance-amount">-- USDT</h1>
+            <button class="small-btn" onclick="requestBalance()">🔄 تحديث</button>
+        </div>
+
+        <div class="actions-grid">
+            <button class="action-btn" data-action="publish">
+                <span class="icon">🚀</span>
+                <span class="text">نشر حملة إعلانية</span>
+            </button>
+            <button class="action-btn" data-action="channels">
+                <span class="icon">📺</span>
+                <span class="text">إدارة قنواتي (الربح)</span>
+            </button>
+            <button class="action-btn" data-action="deposit">
+                <span class="icon">💳</span>
+                <span class="text">شحن الرصيد</span>
+            </button>
+            <button class="action-btn" data-action="withdraw">
+                <span class="icon">💸</span>
+                <span class="text">سحب الأرباح (20$)</span>
+            </button>
+        </div>
+
+        <div class="info-footer">
+            <p>AdFlow Pro - نظام مالي آمن 🔒</p>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
