@@ -1,25 +1,21 @@
-// app.js - النسخة النهائية والذكية
+// app.js - النسخة المباشرة (بدون فلسفة)
 const API_BASE_URL = "https://husamalmswry.pythonanywhere.com";
 
-// هذا السطر الذكي يفحص: هل نحن في تيليجرام أم كروم؟
-// إذا لم يجد تيليجرام، لن يتوقف الكود عن العمل
-const tg = window.Telegram ? window.Telegram.WebApp : null;
+// استدعاء مباشر لمكتبة تيليجرام
+const tg = window.Telegram.WebApp;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // توسيع الواجهة إذا كنا في تيليجرام
-    if (tg) {
-        tg.expand();
-        tg.ready();
-    }
+    // توسيع فوري
+    tg.expand();
 
-    // تشغيل جلب الرصيد فوراً
+    // جلب الرصيد
     fetchUserBalance();
 
     // تفعيل الأزرار
     document.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const action = btn.getAttribute('data-action');
-            handleAction(action);
+            if(action) handleAction(action);
         });
     });
 
@@ -28,15 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchUserBalance() {
-    // نستخدم معرف آمن لا يسبب مشاكل في كروم
-    const userId = tg?.initDataUnsafe?.user?.id; 
     const balanceElement = document.querySelector('.balance-amount');
     
-    // إذا فتحت من كروم (لا يوجد آيدي)، نعرض "زائر"
+    // محاولة قراءة الآيدي بأكثر من طريقة
+    let userId = tg.initDataUnsafe?.user?.id;
+
+    // إذا لم يجد الآيدي، لا يكتب زائر، بل يحاول مرة أخرى أو يكتب خطأ صريح
     if (!userId) {
-        balanceElement.textContent = "زائر (تجريبي)";
-        // هنا يمكنك إيقاف الدالة أو تركها تكمل للتجربة
-        return; 
+        balanceElement.textContent = "خطأ معرف"; // لنعرف أن المشكلة في الآيدي
+        return;
     }
 
     balanceElement.textContent = "جاري التحميل...";
@@ -51,21 +47,17 @@ function fetchUserBalance() {
         if (data.status === "success") {
             balanceElement.textContent = data.balance;
         } else {
-            balanceElement.textContent = "خطأ";
+            balanceElement.textContent = "خطأ سيرفر";
         }
     })
     .catch(err => {
-        console.error(err);
-        balanceElement.textContent = "خطأ اتصال";
+        balanceElement.textContent = "خطأ نت";
     });
 }
 
 function handleAction(action) {
-    if (tg) {
-        tg.sendData(JSON.stringify({ command: action }));
-        alert("تم الإرسال!");
-        tg.close();
-    } else {
-        alert("أنت في المتصفح! هذا الزر يعمل داخل تيليجرام فقط.");
-    }
+    // إرسال البيانات للبوت
+    tg.sendData(JSON.stringify({ command: action }));
+    // إغلاق النافذة فوراً ليشعر المستخدم بالاستجابة
+    tg.close();
 }
