@@ -1,75 +1,69 @@
-// app.js - نسخة محسنة لربط الواجهة بالبوت
-// تهيئة واجهة WebApp الخاصة بتيليجرام (التأكد من وجودها)
-const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+// app.js - النسخة المتصلة بالسيرفر الحي
+const API_BASE_URL = "https://husamalmswry.pythonanywhere.com"; // رابط سيرفرك
 
-// دالة لإرسال أمر للبوت
-function sendCommand(commandName, messageText = "") {
-    if (tg) {
-        tg.sendData(JSON.stringify({
-            command: commandName,
-            message: messageText
-        }));
-        // يمكنك اختيار إغلاق الواجهة أو إظهار رسالة
-        // tg.close();
-    } else {
-        alert("تطبيق تيليجرام غير متاح.");
-    }
-}
+const tg = window.Telegram.WebApp;
 
-// دالة لتحديث الرصيد (يتم استدعاؤها عند فتح الواجهة أو تحديثها)
-function requestBalance() {
-    // هذه الدالة الآن سترسل أمراً للبوت ليقوم هو بالرد بالرصيد
-    sendCommand("/balance_request", "الرجاء تحديث الرصيد.");
-    document.querySelector('.balance-amount').textContent = '... يتم التحديث';
-    // لا نغلق الواجهة هنا، البوت سيعرض الرصيد في المحادثة
-}
-
-// دالة لمعالجة ضغط الأزرار
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. توسيع الواجهة لتملأ الشاشة
     if (tg) {
+        tg.expand();
         tg.ready();
-        // إظهار الرصيد الافتراضي عند التحميل (يمكن تحديثه لاحقاً)
-        document.querySelector('.balance-amount').textContent = '0.00 USDT';
-    } else {
-        document.querySelector('.balance-amount').textContent = 'غير متصل بالبوت';
     }
 
-    document.querySelectorAll('.action-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const action = button.getAttribute('data-action');
-            let commandToSend = "";
+    // 2. محاولة جلب الرصيد فوراً عند الفتح
+    fetchUserBalance();
 
-            // تعيين الأمر الصحيح لكل زر
-            if (action === "publish") {
-                commandToSend = "/publish_ad"; // أمر وهمي للنشر حالياً
-            } else if (action === "channels") {
-                commandToSend = "/my_channels"; // أمر وهمي لإدارة القنوات
-            } else if (action === "deposit") {
-                commandToSend = "/deposit_money_from_web"; // أمر وهمي للشحن من الويب
-            } else if (action === "withdraw") {
-                commandToSend = "/withdraw"; // هذا الأمر حقيقي
-            }
-
-            if (commandToSend) {
-                sendCommand(commandToSend, `طلب من الواجهة: ${action}`);
-                alert(`تم طلب الإجراء: ${action}. يرجى التحقق من رسائل البوت.`);
-                if (tg) tg.close(); // إغلاق الواجهة بعد إرسال الأمر
-            }
+    // 3. تفعيل الأزرار
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const action = btn.getAttribute('data-action');
+            handleAction(action);
         });
     });
-
-    // ربط زر التحديث بالدالة
-    const updateBalanceBtn = document.querySelector('.small-btn');
-    if (updateBalanceBtn) {
-        updateBalanceBtn.addEventListener('click', requestBalance);
-    }
+    
+    // زر تحديث الرصيد الصغير
+    const refreshBtn = document.querySelector('.small-btn');
+    if(refreshBtn) refreshBtn.addEventListener('click', fetchUserBalance);
 });
 
-// هذا الكود يستقبل البيانات من البوت
-if (tg) {
-    tg.onEvent('mainButtonClicked', function(){
-        // إذا كان هناك زر رئيسي في البوت، يمكننا التعامل معه هنا
-        // حالياً لا نحتاجه
+// دالة جلب الرصيد من سيرفر PythonAnywhere
+function fetchUserBalance() {
+    const userId = tg.initDataUnsafe?.user?.id; 
+    const balanceElement = document.querySelector('.balance-amount');
+    
+    if (!userId) {
+        balanceElement.textContent = "زائر (تجريبي)";
+        return;
+    }
+
+    balanceElement.textContent = "جاري التحميل...";
+
+    // الاتصال بالسيرفر
+    fetch(`${API_BASE_URL}/api/get_balance`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_id: userId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            balanceElement.textContent = data.balance; 
+        } else {
+            balanceElement.textContent = "خطأ";
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        balanceElement.textContent = "خطأ في الاتصال";
     });
-    // يمكننا إضافة استماع لـ tg.onEvent('invoiceClosed') أو غيرها لاحقاً
+}
+
+function handleAction(action) {
+    if (tg) {
+        tg.sendData(JSON.stringify({ command: action }));
+        alert("تم إرسال الطلب للبوت! ✅");
+        tg.close();
+    }
 }
